@@ -93,5 +93,6 @@ npm run build
 ## Commit and handoff conventions
 
 - Keep commits focused and use imperative messages.
+- Keep the `Validate site` check green before merging a pull request.
 - Explain user-visible behavior, validation performed, and deployment status in the handoff.
 - For pull requests, include screenshots only when the visual design materially changed.

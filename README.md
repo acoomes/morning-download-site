@@ -34,6 +34,8 @@ npm test
 npm run build
 ```
 
+The `Validate site` GitHub Actions workflow runs lint and the production test suite for every pull request and every push to `main`.
+
 ## Repository map
 
 | Path | Purpose |
