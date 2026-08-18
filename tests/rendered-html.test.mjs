@@ -33,6 +33,8 @@ test("server-renders the Morning Download reader from fallback data", async () =
   assert.match(html, /AI &amp; Agentic Systems/);
   assert.match(html, /Sources &amp; further reading/);
   assert.match(html, /Search <kbd>⌘K<\/kbd>/);
+  assert.match(html, /static\.cloudflareinsights\.com\/beacon\.min\.js/);
+  assert.match(html, /21a15fea64b34a62a5c1affb5b1c5fc2/);
 });
 
 test("keeps live-feed loading resilient", async () => {

@@ -62,3 +62,9 @@ Only refresh `data/briefs.json` when you intentionally want to advance the 30-ed
 Production is hosted with OpenAI Sites and attached to `morning-download.com`. Build successfully before publishing. Agents that support Sites should reuse the project ID in `.openai/hosting.json`, save a new version from the exact pushed commit, and deploy that saved version. Never create a replacement Sites project for routine updates.
 
 No repository or runtime secrets are required for the public briefing feed.
+
+## Analytics
+
+Traffic and performance analytics are collected with Cloudflare Web Analytics. View them from the [Cloudflare Web Analytics dashboard](https://dash.cloudflare.com/?to=%2F%3Aaccount%2Fweb-analytics) by selecting `morning-download.com`.
+
+The public site token is configured in `app/layout.tsx`; it is an identifier used by the browser beacon, not a secret. Keep the beacon in the shared layout so all current and future routes are measured.
