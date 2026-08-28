@@ -370,7 +370,10 @@ export default function MorningDownload() {
 
           <footer>
             <div className="brand footer-brand"><span className="brand-mark">MD</span><span>Morning Download</span></div>
-            <p>Daily news briefings covering world events, markets, and AI systems.</p>
+            <div>
+              <p>Daily news briefings covering world events, markets, and AI systems.</p>
+              <small className="footer-credit"><a href="https://86drift.com" target="_blank" rel="noreferrer">86 Drift</a></small>
+            </div>
             <a href="https://github.com/acoomes/morning-download" target="_blank" rel="noreferrer">View source on GitHub ↗</a>
           </footer>
         </>
