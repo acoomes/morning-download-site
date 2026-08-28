@@ -113,6 +113,9 @@ footer { display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: end; ga
 footer p { margin: 0; color: var(--muted); font: 15px/1.5 var(--serif); }
 footer > a { justify-self: end; font-size: 12px; font-weight: 700; text-decoration: none; }
 footer > a:hover { color: var(--accent); }
+.footer-credit { display: block; margin-top: 12px; color: var(--muted); font-size: 10px; }
+.footer-credit a { text-decoration: none; }
+.footer-credit a:hover { color: var(--accent); }
 
 .archive-panel { min-height: calc(100vh - 78px); padding: 56px 0 100px; }
 .archive-top { display: flex; align-items: start; justify-content: space-between; gap: 30px; padding-bottom: 30px; }
