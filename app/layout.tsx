@@ -36,12 +36,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en">
       <body>
         {children}
-        <script
+        {process.env.NODE_ENV === "production" && <script
           type="module"
           defer
           src="https://static.cloudflareinsights.com/beacon.min.js"
           data-cf-beacon={JSON.stringify({ token: cloudflareAnalyticsToken })}
-        />
+        />}
       </body>
     </html>
   );

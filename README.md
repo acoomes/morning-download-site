@@ -36,6 +36,20 @@ npm run build
 
 The `Validate site` GitHub Actions workflow runs lint and the production test suite for every pull request and every push to `main`.
 
+## Preview unpublished briefing changes
+
+Check out the citation feature branch in both repos, then run from this repo:
+
+```bash
+npm run dev:preview -- "../Morning Download"
+```
+
+This uses the content checkout's canonical feed generator to write an ignored `work/preview/briefs.json`, then starts the local reader with that feed. The preview banner confirms which mode is active. It does not fetch the production briefing feed, change the bundled fallback, push commits, or deploy. If the preview feed fails, the banner explicitly identifies the bundled archive instead. Restart the command after editing briefing Markdown to regenerate the preview.
+
+`npm run dev` continues to use the normal live feed. Production builds always disable the preview override, even if `MORNING_DOWNLOAD_PREVIEW_FEED` is set. The preview endpoint exists only on the development server.
+
+Story citations use the optional `sources: [{ label, url }]` field on each story. Historical editions without it keep their existing layout and full source list.
+
 ## Repository map
 
 | Path | Purpose |
@@ -45,7 +59,7 @@ The `Validate site` GitHub Actions workflow runs lint and the production test su
 | `app/page.tsx` | Home route and page metadata |
 | `data/briefs.json` | Recent 30-edition fallback used when the live feed is unavailable |
 | `tests/rendered-html.test.mjs` | Rendered-output smoke tests |
-| `scripts/generate-briefs.mjs` | Local utility for rebuilding fallback data from an adjacent content checkout |
+| `scripts/generate-briefs.mjs` | Uses the content repo’s feed generator; an explicit fallback refresh keeps the newest 30 editions |
 | `.openai/hosting.json` | Existing OpenAI Sites project binding; contains no secret credentials |
 | `worker/index.ts` | Cloudflare-compatible server entrypoint |
 
@@ -54,6 +68,8 @@ See [`AGENTS.md`](./AGENTS.md) for change boundaries, traversal guidance, and th
 ## Content updates
 
 Do not add daily briefings here. Add or correct Markdown in [`acoomes/morning-download`](https://github.com/acoomes/morning-download). Its `Publish site briefing feed` workflow updates the JSON consumed by this application.
+
+To explicitly refresh the fallback, run `node scripts/generate-briefs.mjs "../Morning Download"`. This requires the content repo’s exported `generateFeed` function.
 
 Only refresh `data/briefs.json` when you intentionally want to advance the 30-edition offline/degraded-mode snapshot. The normal live path does not require a commit or deployment in this repository.
 

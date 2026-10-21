@@ -1,3 +1,4 @@
+import { readFile } from "node:fs/promises";
 import { sites } from "@openai/sites-vite-plugin";
 import vinext from "vinext";
 import { defineConfig } from "vite";
@@ -33,7 +34,13 @@ const localBindingConfig = {
     : [],
 };
 
-export default defineConfig(async () => {
+export default defineConfig(async ({ command }) => {
+  // Only the dev server can read a local preview. Production builds always use the live feed.
+  const previewPath = command === "serve" ? process.env.MORNING_DOWNLOAD_PREVIEW_FEED : undefined;
+  if (previewPath) {
+    const preview = JSON.parse(await readFile(previewPath, "utf8"));
+    if (!Array.isArray(preview) || !preview.length) throw new Error("Preview feed must contain briefings");
+  }
   // Keep Wrangler and Miniflare state project-local. These are non-secret tool
   // settings; application environment belongs in ignored `.env*` files.
   process.env.WRANGLER_WRITE_LOGS ??= "false";
@@ -44,10 +51,29 @@ export default defineConfig(async () => {
   const { cloudflare } = await import("@cloudflare/vite-plugin");
 
   return {
+    define: {
+      "process.env.NEXT_PUBLIC_BRIEFING_PREVIEW": JSON.stringify(previewPath ? "/__preview/briefs.json" : ""),
+    },
     server: isCodexSeatbeltSandbox
       ? { watch: { useFsEvents: false, usePolling: true } }
       : undefined,
     plugins: [
+      {
+        name: "morning-download-local-preview",
+        configureServer(server) {
+          if (!previewPath) return;
+          server.middlewares.use("/__preview/briefs.json", async (_request, response) => {
+            response.setHeader("Cache-Control", "no-store");
+            response.setHeader("Content-Type", "application/json");
+            try {
+              response.end(await readFile(previewPath, "utf8"));
+            } catch {
+              response.statusCode = 503;
+              response.end(JSON.stringify({ error: "Local preview feed is unavailable" }));
+            }
+          });
+        },
+      },
       vinext(),
       sites(),
       cloudflare({

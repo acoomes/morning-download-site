@@ -39,12 +39,14 @@ type Brief = {
   full: string;
   month: string;
   edition: string;
-  world: Array<{ icon: string; title: string; body: string }>;
-  ai: Array<{ icon: string; title: string; body: string }>;
+  world: Array<{ icon: string; title: string; body: string; sources?: Array<{ label: string; url: string }> }>;
+  ai: Array<{ icon: string; title: string; body: string; sources?: Array<{ label: string; url: string }> }>;
   closing: { sleeper: string; oneLiner: string };
   sources: Array<{ label: string; url: string }>;
 };
 ```
+
+Story-level `sources` is optional for historical editions; render it as compact publisher citations when present. The briefing-level list remains the complete bibliography.
 
 Coordinate schema changes with the generator in `acoomes/morning-download/.github/scripts/generate-site-feed.mjs`. Keep fallback behavior intact: a remote outage must not blank the reader.
 

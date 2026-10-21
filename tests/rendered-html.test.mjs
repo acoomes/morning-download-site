@@ -28,6 +28,8 @@ test("server-renders the Morning Download reader from fallback data", async () =
 
   const html = await response.text();
   assert.match(html, />Morning Download</);
+  assert.doesNotMatch(html, /Local preview|preview-notice|__preview\/briefs/);
+  assert.doesNotMatch(html, /class="story-sources"/); // Existing fallback editions have no per-story citations.
   assert.match(html, /The signal before the noise\./);
   assert.match(html, /World &amp; Market Briefing/);
   assert.match(html, /AI &amp; Agentic Systems/);

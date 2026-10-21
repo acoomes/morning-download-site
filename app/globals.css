@@ -80,6 +80,16 @@ main { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
 .story p strong { color: var(--ink); font-weight: 700; }
 .story code { padding: .08em .28em; border: 1px solid var(--line); border-radius: 3px; font: .84em/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; }
 
+.story-sources { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 7px; margin-top: 12px; color: var(--muted); font: 12px/1.6 Arial, Helvetica, sans-serif; }
+.story-sources-label { font-weight: 700; }
+.story-sources ul { display: flex; flex-wrap: wrap; gap: 2px 0; margin: 0; padding: 0; list-style: none; }
+.story-sources li { display: flex; align-items: baseline; min-width: 0; max-width: 100%; }
+.story-sources li + li::before { content: "·"; padding: 0 8px; }
+.story-sources a { display: inline-block; min-height: 24px; padding: 2px 0; overflow-wrap: anywhere; text-decoration-line: underline; text-decoration-color: var(--line); }
+.story-sources a:hover { color: var(--ink); text-decoration-color: currentColor; }
+.story-sources a:focus-visible { color: var(--ink); outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 2px; }
+.preview-notice { margin: 16px 0 0; padding: 10px 14px; border: 1px dashed var(--muted); color: var(--ink); font-size: 13px; }
+
 .closing { padding-top: 8px; }
 .sleeper { display: grid; grid-template-columns: 210px 1fr; column-gap: 36px; padding: 36px 0 40px; border-top: 3px solid var(--ink); }
 .sleeper > p { grid-column: 1 / -1; }
