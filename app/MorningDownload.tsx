@@ -3,7 +3,7 @@
 import { Fragment, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import briefData from "../data/briefs.json";
 
-type Story = { icon: string; title: string; body: string };
+type Story = { icon: string; title: string; body: string; sources?: Source[] };
 type Source = { label: string; url: string };
 type Brief = {
   id: string;
@@ -21,6 +21,7 @@ type Brief = {
 
 const fallbackBriefs = briefData as Brief[];
 const liveFeedUrl = "https://raw.githubusercontent.com/acoomes/morning-download/main/site/briefs.json";
+const previewFeedUrl = process.env.NEXT_PUBLIC_BRIEFING_PREVIEW;
 type SectionFilter = "all" | "world" | "ai";
 
 function InlineText({ text }: { text: string }) {
@@ -40,6 +41,31 @@ function InlineText({ text }: { text: string }) {
   );
 }
 
+function StorySources({ sources }: { sources?: Source[] }) {
+  // Older editions have no story-level citations. Ignore malformed optional data.
+  const validSources = Array.isArray(sources) ? sources.filter((source) => {
+    if (!source || typeof source.label !== "string" || !source.label.trim() || typeof source.url !== "string") return false;
+    try {
+      return ["https:", "http:"].includes(new URL(source.url).protocol);
+    } catch {
+      return false;
+    }
+  }) : [];
+  if (!validSources.length) return null;
+  return (
+    <div className="story-sources">
+      <span className="story-sources-label">Sources:</span>
+      <ul aria-label="Story sources">
+        {validSources.map((source, index) => (
+          <li key={`${source.url}-${index}`}>
+            <a href={source.url} target="_blank" rel="noopener noreferrer">{source.label}</a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function StoryCard({ story, number }: { story: Story; number: number }) {
   return (
     <article className="story">
@@ -50,6 +76,7 @@ function StoryCard({ story, number }: { story: Story; number: number }) {
       <div>
         <h3><InlineText text={story.title} /></h3>
         <p><InlineText text={story.body} /></p>
+        <StorySources sources={story.sources} />
       </div>
     </article>
   );
@@ -86,6 +113,7 @@ export default function MorningDownload() {
   const [section, setSection] = useState<SectionFilter>("all");
   const [archiveOpen, setArchiveOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [previewStatus, setPreviewStatus] = useState("Loading local briefing preview…");
   const deferredQuery = useDeferredValue(query.trim().toLowerCase());
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -134,7 +162,7 @@ export default function MorningDownload() {
   useEffect(() => {
     const controller = new AbortController();
     const cacheWindow = Math.floor(Date.now() / 300_000);
-    fetch(`${liveFeedUrl}?v=${cacheWindow}`, { cache: "no-store", signal: controller.signal })
+    fetch(previewFeedUrl || `${liveFeedUrl}?v=${cacheWindow}`, { cache: "no-store", signal: controller.signal })
       .then((response) => {
         if (!response.ok) throw new Error(`Live feed returned ${response.status}`);
         return response.json();
@@ -145,10 +173,12 @@ export default function MorningDownload() {
         }
         const parsed = nextBriefs as Brief[];
         setBriefs(parsed);
+        if (previewFeedUrl) setPreviewStatus("Local preview · Unpublished briefing and site changes");
         setSelectedId((current) => current === fallbackBriefs[0].id ? parsed[0].id : current);
       })
       .catch((error) => {
         if (error instanceof DOMException && error.name === "AbortError") return;
+        if (previewFeedUrl) setPreviewStatus("Preview feed unavailable · Showing the bundled archive");
         console.warn("Using the bundled Morning Download archive because the live feed is unavailable.", error);
       });
     return () => controller.abort();
@@ -181,6 +211,7 @@ export default function MorningDownload() {
 
   return (
     <main>
+      {previewFeedUrl && <p className="preview-notice" role="status">{previewStatus}</p>}
       <div className="progress" aria-hidden="true" />
       <header className="masthead">
         <button className="brand" type="button" onClick={() => chooseBrief(briefs[0].id)} aria-label="Open latest Morning Download">
